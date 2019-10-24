@@ -92,6 +92,21 @@ class User(db.Model):
 
 db.create_all()
 
+#flask-admin
+
+class UserView(ModelView):
+	column_exclude_list = ['password',]
+	form_excluded_columns = ['password',]
+
+
+admin = Admin(app, name='Administration', template_mode='bootstrap3')
+admin.add_view(UserView(Admin, db.session))
+admin.add_view(UserView(User, db.session))
+admin.add_view(UserView(Channel, db.session))
+admin.add_view(UserView(Post, db.session))
+admin.add_view(UserView(Button, db.session))
+
+#bot
 @app.route('/{}'.format(config.secret), methods=["POST"])
 def webhook():
     if flask.request.headers.get('content-type') == 'application/json':
@@ -101,3 +116,8 @@ def webhook():
         return ''
     else:
         flask.abort(403)
+
+#bot start
+@bot.message_handler(content_types=['photo', 'audio', 'sticker'])
+def content_error(message):
+    bot.send_message(message.chat.id, "Извините, я понимаю только текстовые сообщения и изображения, отправленные в виде файла")
