@@ -35,8 +35,7 @@ user_association = db.Table('user_association', db.Model.metadata,
 	db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
-
-class Admin(db.Model):
+class Author(db.Model):
 
 	__table_args__ = { 'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8', 'mysql_collate': 'utf8_general_ci' }
 
@@ -81,7 +80,7 @@ class Button(db.Model):
 	details = db.Column(db.String(255, collation='utf8_unicode_ci'))
 	post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False)
 	users = db.relationship("User", secondary=user_association, lazy='subquery',
-							backref=db.backref('users', lazy=True))
+							backref=db.backref('button', lazy=True))
 
 	def __str__(self):
 		return self.text
@@ -102,7 +101,7 @@ class UserView(ModelView):
 
 
 admin = Admin(app)
-admin.add_view(UserView(Admin, db.session))
+admin.add_view(UserView(Author, db.session))
 admin.add_view(UserView(User, db.session))
 admin.add_view(UserView(Channel, db.session))
 admin.add_view(UserView(Post, db.session))
