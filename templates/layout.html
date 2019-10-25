@@ -35,7 +35,7 @@
                   </ul>
                 </div>
                 <div class="nav navbar-nav navbar-right stick-right">
-                  {%if user.username%}
+                  {%if author.username%}
                     <ul class="navbar-nav mr-auto">
                       <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -44,7 +44,7 @@
                           </svg>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="right: 0; left: auto; position: absolute;">
-                          <a href="#" class="dropdown-item"> Signed in as: <br> <b>{{user.username}}</b></a>
+                          <a href="#" class="dropdown-item"> Signed in as: <br> <b>{{author.username}}</b></a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" href="/exit"> Sign out</a>
                         </div>
