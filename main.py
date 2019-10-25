@@ -183,6 +183,17 @@ def exit():
 
 #---------------------/session control/--------------------------
 
+#---------------------<admin web pages>--------------------------
+@app.route("/", methods=["GET","POST"])
+def index():
+	return flask.render_template("index.html", author = Author.query.get(flask.session['user_id']))
+
+@app.route("/new", methods=["GET","POST"])
+def new_post():
+	return flask.render_template("new_post.html", author = Author.query.get(flask.session['user_id']))
+
+#---------------------/admin web pages/--------------------------
+
 #bot start
 @bot.message_handler(content_types=['photo', 'audio', 'sticker'])
 def content_error(message):
