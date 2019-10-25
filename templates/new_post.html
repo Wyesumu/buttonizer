@@ -48,7 +48,7 @@
           <a href="javascript:void(0);" class="add_button btn btn-primary">Добавить кнопку</a>
           <div class="field_wrapper">
           </div>
-          <label for="time_input" class="col-md-2 control-label">Время отправки поста (оставить пустым - отправить сразу же)</label>
+          <label for="time_input" class="control-label">Время отправки поста (оставить пустым - отправить сразу же)</label>
           <input id="time_input" name="time_input">
           <input type="submit" class="btn btn-primary float-right my-1" value="Отправить">
         </div>
@@ -77,7 +77,7 @@
         //Check maximum number of input fields
         if(x < maxField){ 
             x++; //Increment field counter
-            $(wrapper).append('<div class="row"><label for="button_title" class="col-md-2 control-label">&nbsp;</label><div class="col-md-2">Заголовок:<input class="form-control" type="text" name="button_title"></div><div class="col-md-2">Содержание:<input class="form-control" type="text" name="button_details" title="Не более 255 символов"></div><div class="col-md-1"><a href="javascript:void(0);" class="remove_button btn btn-warning" style="margin-top:30%;" title="Удалить строку">–</a></div></div>'); //Add field html
+            $(wrapper).append('<div class="row"><div class="col-md-2">Заголовок:<input class="form-control" type="text" name="button_title"></div><div class="col-md-2">Содержание:<input class="form-control" type="text" name="button_details" title="Не более 255 символов"></div><div class="col-md-1"><a href="javascript:void(0);" class="remove_button btn btn-warning" style="margin-top:30%;" title="Удалить строку">–</a></div></div>'); //Add field html
         }
       });
 
