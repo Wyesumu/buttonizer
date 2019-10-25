@@ -200,7 +200,7 @@ def new_post():
 @app.route('/cal') #page with calendar
 @is_logged
 def calendar():
-	return flask.render_template("cal.html", user = User.query.get(flask.session['user_id']))
+	return flask.render_template("cal.html", author = Author.query.get(flask.session['user_id']))
 
 @app.route('/data') #send JSON events to calendar
 @is_logged
