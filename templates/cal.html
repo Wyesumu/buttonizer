@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+{% block header %}
+<link href="/static/cal/fullcalendar.min.css" rel='stylesheet' />
+<link href="/static/cal/fullcalendar.print.css" rel='stylesheet' media='print' />
+<style>
+
+    #script-warning {
+        display: none;
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+        padding: 0 10px;
+        line-height: 40px;
+        text-align: center;
+        font-weight: bold;
+        color: red;
+    }
+    #loading {
+        display: none;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    #calendar {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+</style>
+{%endblock%}
+{%block content%}
+
+    <div id='script-warning'>
+        Error getting data from <code>/data</code> endpoint.
+    </div>
+
+    <div id='loading'>loading...</div>
+
+    <div id='calendar'></div>
+
+{%endblock%}
+{%block script%}
+<script src="/static/cal/lib/moment.min.js"></script>
+<script src="/static/cal/lib/jquery.min.js"></script>
+<script src="/static/cal/fullcalendar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            editable: false,
+            eventLimit: true, // allow "more" link when too many events
+            events: {
+                url: 'data',
+                error: function() {
+                    $('#script-warning').show();
+                }
+            },
+            loading: function(bool) {
+                $('#loading').toggle(bool);
+            }
+        });
+    });
+</script>
+{%endblock%}

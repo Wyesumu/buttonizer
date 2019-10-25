@@ -28,6 +28,9 @@ app.secret_key = config.secret
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+config.db_user+':'+config.db_pass+'@'+config.db_host+'/'+config.db_name + '?charset=utf8mb4'
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
+
+#-------------------<database>---------------------------
+
 db = SQLAlchemy(app)
 
 user_association = db.Table('user_association', db.Model.metadata,
@@ -74,6 +77,7 @@ class Post(db.Model):
 	image_addr = db.Column(db.String(255, collation='utf8_unicode_ci'))
 	chanel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=False)
 	buttons = db.relationship('Button', backref='post', lazy=True)
+	date = db.Column(db.DateTime)
 
 	def __str__(self):
 		return self.text
@@ -99,9 +103,21 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 
 db.create_all()
+#-------------------/database/---------------------------
 
-#flask-admin
+#-------------------<tool functions>---------------------------
+#decorator to check if user logged in
+def is_logged(func):
+	@wraps(func)
+	def wrapper(*args, **kwargs):
+		if 'logged' in flask.session:
+			return func(*args, **kwargs)
+		else:
+			return flask.redirect(flask.url_for("login"))
+	return wrapper
+#------------------/tool functions/---------------------------
 
+#--------------------<flask-admin>---------------------------
 class UserView(ModelView):
 	column_exclude_list = ['password',]
 	form_excluded_columns = ['password',]
@@ -113,21 +129,9 @@ admin.add_view(UserView(User, db.session))
 admin.add_view(UserView(Channel, db.session))
 admin.add_view(UserView(Post, db.session))
 admin.add_view(UserView(Button, db.session))
+#----------------------/flask-admin/-------------------------
 
-#bot
-@app.route('/{}'.format(config.secret), methods=["POST"])
-def webhook():
-    if flask.request.headers.get('content-type') == 'application/json':
-        json_string = flask.request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return ''
-    else:
-        flask.abort(403)
-
-#site start
 #--------------------<session control>----------------------
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 	if flask.request.method == 'POST':
@@ -180,21 +184,52 @@ def register():
 def exit():
 	flask.session.clear() #clear session when user log out
 	return flask.redirect(flask.url_for("login"))
-
 #---------------------/session control/--------------------------
 
-#---------------------<admin web pages>--------------------------
+#---------------------<author web pages>--------------------------
 @app.route("/", methods=["GET","POST"])
+@is_logged
 def index():
 	return flask.render_template("index.html", author = Author.query.get(flask.session['user_id']))
 
 @app.route("/new", methods=["GET","POST"])
+@is_logged
 def new_post():
 	return flask.render_template("new_post.html", author = Author.query.get(flask.session['user_id']))
 
-#---------------------/admin web pages/--------------------------
+@app.route('/cal') #page with calendar
+@is_logged
+def calendar():
+	return flask.render_template("cal.html", user = User.query.get(flask.session['user_id']))
+
+@app.route('/data') #send JSON events to calendar
+@is_logged
+def return_data():
+	json = []
+	posts = []
+	for channel in Author.query.get(flask.session['user_id']).channel:
+		for post in channel.posts:
+			if not task.closed:
+				posts.append(post)
+	for data in posts:
+		json.append({"id":str(data.id),"title":str(data.text),"url":"/admin/post/edit/?id="+str(data.id),"start":str(data.date).replace(" ","T")})
+	return flask.jsonify(json)
+#---------------------/author web pages/--------------------------
+
+#---------------------<telegram bot>--------------------------
+@app.route('/{}'.format(config.secret), methods=["POST"])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        return ''
+    else:
+        flask.abort(403)
 
 #bot start
 @bot.message_handler(content_types=['photo', 'audio', 'sticker'])
 def content_error(message):
     bot.send_message(message.chat.id, "Извините, я понимаю только текстовые сообщения и изображения, отправленные в виде файла")
+
+#---------------------/telegram bot/--------------------------
