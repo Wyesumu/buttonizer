@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+{% block title %}Новый пост{% endblock %}
+{% block header%}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block content %}
+<div class="col" style="padding-bottom: 15px">
+	<div class="card bg-light">
+	  <div class="card-header">
+	      <ul class="nav nav-pills card-header-pills">
+	        <li class="nav-item">
+	          <a class="btn" href="{{url_for('index')}}">
+	            <span>
+	            	<svg id="i-chevron-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                	<path d="M20 30 L8 16 20 2" />
+                </svg>
+              </span>
+              Отмена
+            </a>
+          </li>
+        </ul>
+    </div>
+
+    <div class="card-body">
+      <form action="" method="POST">
+    	  <h5 class="mb-1">Новый пост</h5>
+        <div class="col">
+        	<div class="input-group mb-3">
+  					<div class="input-group-prepend">
+    					<label class="input-group-text" for="inputGroupSelect01">@</label>
+  					</div>
+  					<select class="custom-select" id="inputGroupSelect01">
+  						{%for channel in author.channel%}
+  				  		<option value="{{author.channel}}">{{author.channel}}</option>
+  						{%endfor%}
+  					</select>
+					</div>
+
+					<div class="input-group mb-3">
+  					<div class="custom-file">
+    					<input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" name="image">
+    					<label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+  					</div>
+					</div>
+          <textarea name="details" class="form-control my-1" rows="5" autocomplete="off" placeholder="Введите текст поста"></textarea>
+
+          <a href="javascript:void(0);" class="add_button btn btn-primary">Добавить кнопку</a>
+          <div class="field_wrapper">
+          </div>
+          <label for="time_input" class="col-md-2 control-label">Время отправки поста (оставить пустым - отправить сразу же)</label>
+          <input id="time_input" name="time_input">
+          <input type="submit" class="btn btn-primary float-right my-1" value="Отправить">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{%endblock%}
+{% block script%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/js/gijgo.min.js" type="text/javascript"></script>
+<script>
+  $('#time_input').datetimepicker({ footer: true, modal: true, format: 'yyyy-mm-dd HH:MM', uiLibrary: 'bootstrap4' });
+</script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var maxField = 10; //Input fields increment limitation
+      var addButton = $('.add_button'); //Add button selector
+      var wrapper = $('.field_wrapper'); //Input field wrapper
+      var x = 0; //Initial field counter is 1
+    
+      //Once add button is clicked
+      $(addButton).click(function(){
+        //Check maximum number of input fields
+        if(x < maxField){ 
+            x++; //Increment field counter
+            $(wrapper).append('<div class="row"><label for="button_title" class="col-md-2 control-label">&nbsp;</label><div class="col-md-2">Заголовок:<input class="form-control" type="text" name="button_title"></div><div class="col-md-2">Содержание:<input class="form-control" type="text" name="button_details" title="Не более 255 символов"></div><div class="col-md-1"><a href="javascript:void(0);" class="remove_button btn btn-warning" style="margin-top:30%;" title="Удалить строку">–</a></div></div>'); //Add field html
+        }
+      });
+
+      $(wrapper).on('click', '.dp', function(e){
+        e.preventDefault();
+        $(this).datetimepicker({ footer: true, modal: true, format: 'yyyy-mm-dd HH:MM:SS', uiLibrary: 'bootstrap' }).open();
+      });
+
+      //Once remove button is clicked
+      $(wrapper).on('click', '.remove_button', function(e){
+        e.preventDefault();
+        $(this).parent('div').parent('div').remove(); //Remove field html
+        x--; //Decrement field counter
+      });
+    });
+	</script>
+
+{% endblock %}
