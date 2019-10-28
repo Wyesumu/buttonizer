@@ -211,7 +211,7 @@ def new_post():
 		db.session.add(new_post)
 		db.session.flush()
 
-		for i in range(0, f['button_title']):
+		for i in range(0, len(f['button_title'])):
 			new_button = Button(text = f["button_title"][i], details = f["button_details"][i], post_id = new_post.id)
 			db.session.add(new_button)
 		db.session.commit()
