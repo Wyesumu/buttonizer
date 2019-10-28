@@ -209,8 +209,7 @@ def return_data():
 	posts = []
 	for channel in Author.query.get(flask.session['user_id']).channel:
 		for post in channel.posts:
-			if not task.closed:
-				posts.append(post)
+			posts.append(post)
 	for data in posts:
 		json.append({"id":str(data.id),"title":str(data.text),"url":"/admin/post/edit/?id="+str(data.id),"start":str(data.date).replace(" ","T")})
 	return flask.jsonify(json)
