@@ -221,7 +221,7 @@ def new_post():
 			for button in new_post.buttons:
 				keyboard.add(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
     			
-			bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
+			bot.send_message('@' + new_post.channel.name, new_post.text, reply_markup=keyboard)
 		
 		return flask.redirect(flask.url_for("new_post"))
 
