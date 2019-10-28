@@ -192,10 +192,17 @@ def exit():
 def index():
 	return flask.render_template("index.html", author = Author.query.get(flask.session['user_id']))
 
+
+
 @app.route("/new", methods=["GET","POST"])
 @is_logged
 def new_post():
-	return flask.render_template("new_post.html", author = Author.query.get(flask.session['user_id']))
+	if flask.request.method == 'GET':
+		return flask.render_template("new_post.html", author = Author.query.get(flask.session['user_id']))
+	else:
+		f = flask.request.form.to_dict(flat=False)
+		print(f)
+
 
 @app.route('/cal') #page with calendar
 @is_logged
@@ -209,6 +216,7 @@ def return_data():
 	posts = []
 	for channel in Author.query.get(flask.session['user_id']).channel:
 		for post in channel.posts:
+			
 			posts.append(post)
 	for data in posts:
 		json.append({"id":str(data.id),"title":str(data.text),"url":"/admin/post/edit/?id="+str(data.id),"start":str(data.date).replace(" ","T")})
