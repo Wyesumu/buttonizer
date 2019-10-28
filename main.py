@@ -75,7 +75,7 @@ class Post(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	text = db.Column(db.String(255, collation='utf8_unicode_ci'))
 	image_addr = db.Column(db.String(255, collation='utf8_unicode_ci'))
-	chanel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=False)
+	channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=False)
 	buttons = db.relationship('Button', backref='post', lazy=True)
 	date = db.Column(db.DateTime)
 
@@ -201,7 +201,28 @@ def new_post():
 		return flask.render_template("new_post.html", author = Author.query.get(flask.session['user_id']))
 	else:
 		f = flask.request.form.to_dict(flat=False)
-		print(f)
+
+		if flask.request.form['time_input'] == '':
+			time = None
+		else:
+			time = dt.strptime(flask.request.form['time_input'], "%Y-%m-%d %H:%M")
+
+		new_post = Post(text = f["details"], image_addr = f["image"], channel_id = Channel.query.filter_by(name = f["channel"]).first(), date = time)
+		db.session.add(new_post)
+		db.session.flush()
+
+		for i in range(0, f['button_title']):
+			new_button = Button(text = f["button_title"][i], details = f["button_details"][i], post_id = new_post.id)
+			db.session.add(new_button)
+		db.session.commit()
+
+		if not time:
+			keyboard = telebot.types.InlineKeyboardMarkup()
+			for button in new_post.buttons:
+				keyboard.add(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
+    			
+			bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
+		
 		return flask.redirect(flask.url_for("new_post"))
 
 
@@ -217,7 +238,6 @@ def return_data():
 	posts = []
 	for channel in Author.query.get(flask.session['user_id']).channel:
 		for post in channel.posts:
-			
 			posts.append(post)
 	for data in posts:
 		json.append({"id":str(data.id),"title":str(data.text),"url":"/admin/post/edit/?id="+str(data.id),"start":str(data.date).replace(" ","T")})
