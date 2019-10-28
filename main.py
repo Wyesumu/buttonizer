@@ -202,6 +202,7 @@ def new_post():
 	else:
 		f = flask.request.form.to_dict(flat=False)
 		print(f)
+		return flask.redirect(flask.url_for("new"))
 
 
 @app.route('/cal') #page with calendar
