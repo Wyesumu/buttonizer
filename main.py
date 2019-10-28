@@ -207,7 +207,7 @@ def new_post():
 		else:
 			time = dt.strptime(flask.request.form['time_input'], "%Y-%m-%d %H:%M")
 
-		new_post = Post(text = f["details"], image_addr = f["image"], channel_id = Channel.query.filter_by(name = f["channel"]).first(), date = time)
+		new_post = Post(text = f["details"], image_addr = f["image"], channel_id = Channel.query.filter_by(name = f["channel"]).first().id, date = time)
 		db.session.add(new_post)
 		db.session.flush()
 
