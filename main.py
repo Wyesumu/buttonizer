@@ -289,15 +289,17 @@ def content_error(message):
 def Callback_answer(call):
 	try:
 		button = Button.query.get(call.data)
-		if not call.from_user.id in button.users: #need to make check if user in db
-			#DbInsertUser(connection, call.data, call.from_user.id, call.from_user.username) #call.message.chat.username
-			if not User.query.get(call.from_user.id):
-				new_user = User(id = call.from_user.id)
+		if not User.query.get(call.from_user.id):
+			bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
+			new_user = User(id = call.from_user.id)
 			button.users.append(new_user)
 			db.session.add(button)
 			db.session.commit()
+		elif not call.from_user.id in button.users:
 			bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
-			print(call.id, call.data, Button.query.get(call.data))
+			button.users.append(User.query.get(call.from_user.id))
+			db.session.add(button)
+			db.session.commit()
 		else:
 			bot.answer_callback_query(call.id, text="Вы уже ответили")
 	except telebot.apihelper.ApiException:
