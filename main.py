@@ -218,7 +218,7 @@ def new_post():
 
 		if not time:
 			keyboard = telebot.types.InlineKeyboardMarkup()
-			button = []
+			buttons = []
 			for button in new_post.buttons:
 				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
 			keyboard.add(buttons)
