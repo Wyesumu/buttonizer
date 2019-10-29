@@ -211,7 +211,7 @@ def new_post():
 		db.session.add(new_post)
 		db.session.flush()
 
-		file = request.files['image']
+		file = flask.request.files['image']
 		if file and file.filename.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')):
 			file.save(os.path.join(config.UPLOAD_FOLDER, file.filename))
 
