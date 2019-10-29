@@ -27,9 +27,6 @@
     	  <h5 class="mb-1">Новый пост</h5>
         <div class="col">
         	<div class="input-group mb-3">
-  					<div class="input-group-prepend">
-    					<label class="input-group-text" for="inputGroupSelect01">@</label>
-  					</div>
   					<select class="custom-select" id="inputGroupSelect01" name="channel">
   						{%for channel in author.channel%}
   				  		<option value="{{channel.name}}">{{channel.name}}</option>
