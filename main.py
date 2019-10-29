@@ -222,8 +222,9 @@ def new_post():
 			for button in new_post.buttons:
 				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
 			for i in range(0,len(buttons),3):
-				keyboard.row(buttons[i:i+3])
-    			
+				print(*buttons[i:i+3])
+				keyboard.add(*buttons[i:i+3])
+			
 			bot.send_message('@' + new_post.channel.name, new_post.text, reply_markup=keyboard)
 		
 		return flask.redirect(flask.url_for("new_post"))
@@ -263,4 +264,16 @@ def webhook():
 def content_error(message):
     bot.send_message(message.chat.id, "Извините, я понимаю только текстовые сообщения и изображения, отправленные в виде файла")
 
+@bot.callback_query_handler(func=lambda call: True)
+def Callback_answer(call):
+    try:
+        if True: #need to make check if user in db
+            #DbInsertUser(connection, call.data, call.from_user.id, call.from_user.username) #call.message.chat.username
+            bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data))
+        else:
+            bot.answer_callback_query(call.id, text="Вы уже ответили")
+    except telebot.apihelper.ApiException:
+        print(" Warning: Server overloaded and wasn't able to answer in time")
+    except Exception as e:
+        print(" Callback Ошибка: " + str(e))
 #---------------------/telegram bot/--------------------------
