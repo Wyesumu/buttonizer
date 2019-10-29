@@ -212,7 +212,7 @@ def new_post():
 		db.session.flush()
 
 		if new_post.image_addr:
-			if message.document.file_name.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')): # check if document is image
+			if new_post.image_addr.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')): # check if document is image
 				file_info = bot.get_file(message.document.file_id) # download image
 				downloaded_file = bot.download_file(file_info.file_path)
 				src = config.UPLOAD_FOLDER + message.document.file_name;
