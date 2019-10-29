@@ -269,7 +269,7 @@ def Callback_answer(call):
     try:
         if True: #need to make check if user in db
             #DbInsertUser(connection, call.data, call.from_user.id, call.from_user.username) #call.message.chat.username
-            bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data))
+            bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
             print(call.id, call.data, Button.query.get(call.data))
         else:
             bot.answer_callback_query(call.id, text="Вы уже ответили")
