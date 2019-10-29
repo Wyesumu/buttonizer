@@ -211,6 +211,14 @@ def new_post():
 		db.session.add(new_post)
 		db.session.flush()
 
+		if new_post.image:
+			if message.document.file_name.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')): # check if document is image
+            	file_info = bot.get_file(message.document.file_id) # download image
+            	downloaded_file = bot.download_file(file_info.file_path)
+            	src = config.UPLOAD_FOLDER + message.document.file_name;
+            	with open(src, 'wb') as new_file:
+                	new_file.write(downloaded_file) #put image to tmp folder
+
 		for i in range(0, len(f['button_title'])):
 			new_button = Button(text = f["button_title"][i], details = f["button_details"][i], post_id = new_post.id)
 			db.session.add(new_button)
@@ -221,11 +229,27 @@ def new_post():
 			buttons = []
 			for button in new_post.buttons:
 				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
+
 			for i in range(0,len(buttons),3):
 				print(*buttons[i:i+3])
 				keyboard.add(*buttons[i:i+3])
-			
-			bot.send_message('@' + new_post.channel.name, new_post.text, reply_markup=keyboard)
+
+			try:
+				if new_post.image and new_post.text:
+					photo = open(config.tmp + PicAddr, 'rb')
+					bot.send_photo(new_post.channel.name, photo, new_post.text, reply_markup=keyboard)
+					photo.close()
+					os.remove(config.UPLOAD_FOLDER + PicAddr)
+				elif new_post.image:
+					photo = open(config.tmp + PicAddr, 'rb')
+					bot.send_photo(new_post.channel.name, photo, reply_markup=keyboard)
+					photo.close()
+					os.remove(config.UPLOAD_FOLDER + PicAddr)
+				else:
+					bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
+
+			except Exception as e:
+				flask.flash(e)
 		
 		return flask.redirect(flask.url_for("new_post"))
 
