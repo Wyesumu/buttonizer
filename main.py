@@ -272,36 +272,36 @@ def return_data():
 #---------------------<telegram bot>--------------------------
 @app.route('/{}'.format(config.secret), methods=["POST"])
 def webhook():
-    if flask.request.headers.get('content-type') == 'application/json':
-        json_string = flask.request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return ''
-    else:
-        flask.abort(403)
+	if flask.request.headers.get('content-type') == 'application/json':
+		json_string = flask.request.get_data().decode('utf-8')
+		update = telebot.types.Update.de_json(json_string)
+		bot.process_new_updates([update])
+		return ''
+	else:
+		flask.abort(403)
 
 #bot start
 @bot.message_handler(content_types=['photo', 'audio', 'sticker'])
 def content_error(message):
-    bot.send_message(message.chat.id, "Извините, я понимаю только текстовые сообщения и изображения, отправленные в виде файла")
+	bot.send_message(message.chat.id, "Извините, я понимаю только текстовые сообщения и изображения, отправленные в виде файла")
 
 @bot.callback_query_handler(func=lambda call: True)
 def Callback_answer(call):
-    try:
-    	button = Button.query.get(call.data)
-        if not call.from_user.id in button.users: #need to make check if user in db
-            #DbInsertUser(connection, call.data, call.from_user.id, call.from_user.username) #call.message.chat.username
-            if not User.query.get(call.from_user.id):
-            	new_user = User(id = call.from_user.id)
-            button.users.append(new_user)
-            db.session.add(button)
-            db.session.commit()
-            bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
-            print(call.id, call.data, Button.query.get(call.data))
-        else:
-            bot.answer_callback_query(call.id, text="Вы уже ответили")
-    except telebot.apihelper.ApiException:
-        print(" Warning: Server overloaded and wasn't able to answer in time")
-    except Exception as e:
-        print(" Callback Ошибка: " + str(e))
+	try:
+		button = Button.query.get(call.data)
+		if not call.from_user.id in button.users: #need to make check if user in db
+			#DbInsertUser(connection, call.data, call.from_user.id, call.from_user.username) #call.message.chat.username
+			if not User.query.get(call.from_user.id):
+				new_user = User(id = call.from_user.id)
+			button.users.append(new_user)
+			db.session.add(button)
+			db.session.commit()
+			bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
+			print(call.id, call.data, Button.query.get(call.data))
+		else:
+			bot.answer_callback_query(call.id, text="Вы уже ответили")
+	except telebot.apihelper.ApiException:
+		print(" Warning: Server overloaded and wasn't able to answer in time")
+	except Exception as e:
+		print(" Callback Ошибка: " + str(e))
 #---------------------/telegram bot/--------------------------
