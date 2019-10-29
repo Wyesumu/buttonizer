@@ -217,10 +217,12 @@ def new_post():
 		db.session.commit()
 
 		if not time:
+			keyboard = telebot.types.InlineKeyboardMarkup()
 			buttons = []
 			for button in new_post.buttons:
 				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
-			keyboard = telebot.types.InlineKeyboardMarkup(buttons)
+			for i in range(0,len(buttons),3):
+				keyboard.row(buttons[i;i+3])
     			
 			bot.send_message('@' + new_post.channel.name, new_post.text, reply_markup=keyboard)
 		
