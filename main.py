@@ -233,15 +233,15 @@ def new_post():
 
 			try:
 				if new_post.image_addr and new_post.text:
-					photo = open(config.tmp + PicAddr, 'rb')
+					photo = open(config.tmp + new_post.image_addr, 'rb')
 					bot.send_photo(new_post.channel.name, photo, new_post.text, reply_markup=keyboard)
 					photo.close()
-					os.remove(config.UPLOAD_FOLDER + PicAddr)
+					os.remove(config.UPLOAD_FOLDER + new_post.image_addr)
 				elif new_post.image_addr:
-					photo = open(config.tmp + PicAddr, 'rb')
+					photo = open(config.tmp + new_post.image_addr, 'rb')
 					bot.send_photo(new_post.channel.name, photo, reply_markup=keyboard)
 					photo.close()
-					os.remove(config.UPLOAD_FOLDER + PicAddr)
+					os.remove(config.UPLOAD_FOLDER + new_post.image_addr)
 				else:
 					bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
 
