@@ -213,7 +213,7 @@ def new_post():
 
 		if new_post.image_addr:
 			if new_post.image_addr[0].endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')): # check if document is image
-				f["image"].save(os.path.join(config.UPLOAD_FOLDER, f["image"][0].filename))
+				f["image"][0].save(os.path.join(config.UPLOAD_FOLDER, f["image"][0].filename))
 
 		for i in range(0, len(f['button_title'])):
 			new_button = Button(text = f["button_title"][i], details = f["button_details"][i], post_id = new_post.id)
