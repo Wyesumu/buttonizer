@@ -213,11 +213,7 @@ def new_post():
 
 		if new_post.image_addr:
 			if new_post.image_addr[0].endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')): # check if document is image
-				file_info = bot.get_file(message.document.file_id) # download image
-				downloaded_file = bot.download_file(file_info.file_path)
-				src = config.UPLOAD_FOLDER + message.document.file_name;
-				with open(src, 'wb') as new_file:
-					new_file.write(downloaded_file) #put image to tmp folder
+				f["image"].save(os.path.join(config.UPLOAD_FOLDER, f["image"].filename))
 
 		for i in range(0, len(f['button_title'])):
 			new_button = Button(text = f["button_title"][i], details = f["button_details"][i], post_id = new_post.id)
