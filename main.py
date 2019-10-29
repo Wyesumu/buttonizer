@@ -211,7 +211,7 @@ def new_post():
 		db.session.add(new_post)
 		db.session.flush()
 
-		if new_post.image:
+		if new_post.image_addr:
 			if message.document.file_name.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')): # check if document is image
 				file_info = bot.get_file(message.document.file_id) # download image
 				downloaded_file = bot.download_file(file_info.file_path)
@@ -235,12 +235,12 @@ def new_post():
 				keyboard.add(*buttons[i:i+3])
 
 			try:
-				if new_post.image and new_post.text:
+				if new_post.image_addr and new_post.text:
 					photo = open(config.tmp + PicAddr, 'rb')
 					bot.send_photo(new_post.channel.name, photo, new_post.text, reply_markup=keyboard)
 					photo.close()
 					os.remove(config.UPLOAD_FOLDER + PicAddr)
-				elif new_post.image:
+				elif new_post.image_addr:
 					photo = open(config.tmp + PicAddr, 'rb')
 					bot.send_photo(new_post.channel.name, photo, reply_markup=keyboard)
 					photo.close()
