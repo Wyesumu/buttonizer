@@ -123,7 +123,7 @@ class UserView(ModelView):
 	form_excluded_columns = ['password',]
 
 
-admin = Admin(app, name='admin', template_mode='bootstrap3', url='/')
+admin = Admin(app)
 admin.add_view(UserView(Author, db.session))
 admin.add_view(UserView(User, db.session))
 admin.add_view(UserView(Channel, db.session))
