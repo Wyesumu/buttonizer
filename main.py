@@ -207,11 +207,12 @@ def new_post():
 		else:
 			time = dt.strptime(flask.request.form['time_input'], "%Y-%m-%d %H:%M")
 
-		new_post = Post(text = f["details"], image_addr = f["image"], channel_id = Channel.query.filter_by(name = f["channel"]).first().id, date = time)
+		file = flask.request.files['image']
+
+		new_post = Post(text = f["details"], image_addr = file.filename, channel_id = Channel.query.filter_by(name = f["channel"]).first().id, date = time)
 		db.session.add(new_post)
 		db.session.flush()
 
-		file = flask.request.files['image']
 		if file and file.filename.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG')):
 			file.save(os.path.join(config.UPLOAD_FOLDER, file.filename))
 
