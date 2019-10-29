@@ -233,20 +233,26 @@ def new_post():
 
 			try:
 				if new_post.image_addr and new_post.text:
+					print("1")
 					photo = open(config.tmp + new_post.image_addr, 'rb')
 					bot.send_photo(new_post.channel.name, photo, new_post.text, reply_markup=keyboard)
 					photo.close()
 					os.remove(config.UPLOAD_FOLDER + new_post.image_addr)
+					print("1.5")
 				elif new_post.image_addr:
+					print("2")
 					photo = open(config.tmp + new_post.image_addr, 'rb')
 					bot.send_photo(new_post.channel.name, photo, reply_markup=keyboard)
 					photo.close()
 					os.remove(config.UPLOAD_FOLDER + new_post.image_addr)
+					print("2.5")
 				else:
+					print("3")
 					bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
 
 			except Exception as e:
 				flask.flash(e)
+				print(e)
 		
 		return flask.redirect(flask.url_for("new_post"))
 
