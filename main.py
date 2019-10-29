@@ -218,11 +218,12 @@ def new_post():
 
 		if not time:
 			keyboard = telebot.types.InlineKeyboardMarkup()
+			button = []
 			for button in new_post.buttons:
-				keyboard.add(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
+				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
+			keyboard.add(buttons)
     			
-			bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
-			print(new_post.channel.name)
+			bot.send_message('@' + new_post.channel.name, new_post.text, reply_markup=keyboard)
 		
 		return flask.redirect(flask.url_for("new_post"))
 
