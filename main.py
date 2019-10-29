@@ -288,8 +288,14 @@ def content_error(message):
 @bot.callback_query_handler(func=lambda call: True)
 def Callback_answer(call):
     try:
-        if True: #need to make check if user in db
+    	button = Button.query.get(call.data)
+        if not call.from_user.id in button.users: #need to make check if user in db
             #DbInsertUser(connection, call.data, call.from_user.id, call.from_user.username) #call.message.chat.username
+            if not User.query.get(call.from_user.id):
+            	new_user = User(id = call.from_user.id)
+            button.users.append(new_user)
+            db.session.add(button)
+            db.session.commit()
             bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
             print(call.id, call.data, Button.query.get(call.data))
         else:
