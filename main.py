@@ -83,7 +83,7 @@ class Post(db.Model):
 	channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=False)
 	buttons = db.relationship('Button', backref='post', lazy=True)
 	date = db.Column(db.DateTime)
-	users = db.relationship("User", secondary=user_association, lazy='subquery',
+	users = db.relationship("User", secondary=user_post_association, lazy='subquery',
 							backref=db.backref('post', lazy=True))
 
 	def __str__(self):
