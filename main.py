@@ -38,6 +38,11 @@ user_association = db.Table('user_association', db.Model.metadata,
 	db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
+user_post_association = db.Table('user_post_association', db.Model.metadata,
+	db.Column('post_id', db.Integer, db.ForeignKey('post.id'), primary_key=True),
+	db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 author_association = db.Table('author_association', db.Model.metadata,
 	db.Column('channel_id', db.Integer, db.ForeignKey('channel.id'), primary_key=True),
 	db.Column('author_id', db.Integer, db.ForeignKey('author.id'), primary_key=True)
@@ -78,6 +83,8 @@ class Post(db.Model):
 	channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=False)
 	buttons = db.relationship('Button', backref='post', lazy=True)
 	date = db.Column(db.DateTime)
+	users = db.relationship("User", secondary=user_association, lazy='subquery',
+							backref=db.backref('post', lazy=True))
 
 	def __str__(self):
 		return self.text
@@ -289,19 +296,30 @@ def content_error(message):
 def Callback_answer(call):
 	try:
 		button = Button.query.get(call.data)
-		if not User.query.get(call.from_user.id):
-			bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
-			new_user = User(id = call.from_user.id)
-			button.users.append(new_user)
+		user = User.query.get(call.from_user.id)
+		post = Post.query.get(button.post_id)
+
+		if not user:
+			user = User(id = call.from_user.id)
+			db.session.add(user)
+			db.session.flush()
+
+		if user not in post.users:
+			bot.answer_callback_query(call.id, show_alert=True, text=button.details)
+			user = User(id = call.from_user.id)
+			post.users.append(user)
+			button.users.append(user)
+			db.session.add(post)
 			db.session.add(button)
-			db.session.commit()
-		elif not call.from_user.id in button.users:
-			bot.answer_callback_query(call.id, show_alert=True, text=Button.query.get(call.data).details)
-			button.users.append(User.query.get(call.from_user.id))
-			db.session.add(button)
-			db.session.commit()
+			db.session.flush()
 		else:
-			bot.answer_callback_query(call.id, text="Вы уже ответили")
+			if user in button.users:
+				bot.answer_callback_query(call.id, show_alert=True, text=button.details)
+			else:
+				bot.answer_callback_query(call.id, text="Вы уже ответили")
+
+		db.session.commit()
+		
 	except telebot.apihelper.ApiException:
 		print(" Warning: Server overloaded and wasn't able to answer in time")
 	except Exception as e:
