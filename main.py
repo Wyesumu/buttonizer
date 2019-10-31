@@ -101,13 +101,16 @@ class Button(db.Model):
 							backref=db.backref('button', lazy=True))
 
 	def __str__(self):
-		return self.text
+		return self.id
 
 class User(db.Model):
 
 	__table_args__ = { 'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8', 'mysql_collate': 'utf8_general_ci' }
 
 	id = db.Column(db.Integer, primary_key=True)
+
+	def __str__(self):
+		return self.id
 
 db.create_all()
 #-------------------/database/---------------------------
@@ -122,20 +125,56 @@ def is_logged(func):
 		else:
 			return flask.redirect(flask.url_for("login"))
 	return wrapper
+
+@is_logged
+def getUser():
+	return Author.query.get(flask.session['user_id'])
+
+#is user allowed to access this page
+def user_allowed(level):
+	if getUser().privileges <= level:
+		return True
+	else:
+		return False
 #------------------/tool functions/---------------------------
 
 #--------------------<flask-admin>---------------------------
-class UserView(ModelView):
+class AuthorView(ModelView):
 	column_exclude_list = ['password',]
 	form_excluded_columns = ['password',]
 
+	def is_accessible(self):
+		return user_allowed(2)
+
+class ChannelView(ModelView):
+
+	def is_accessible(self):
+		return user_allowed(2)
+
+class PostView(ModelView):
+
+	def is_accessible(self):
+		return user_allowed(5)
+
+class UserView(ModelView):
+	column_display_pk = True
+
+	def is_accessible(self):
+		return user_allowed(2)
+
+class ButtonView(ModelView):
+	column_display_pk = True
+
+	def is_accessible(self):
+		return user_allowed(5)
+
 
 admin = Admin(app)
-admin.add_view(UserView(Author, db.session))
+admin.add_view(AuthorView(Author, db.session))
+admin.add_view(ChannelView(Channel, db.session))
 admin.add_view(UserView(User, db.session))
-admin.add_view(UserView(Channel, db.session))
-admin.add_view(UserView(Post, db.session))
-admin.add_view(UserView(Button, db.session))
+admin.add_view(PostView(Post, db.session))
+admin.add_view(ButtonView(Button, db.session))
 #----------------------/flask-admin/-------------------------
 
 #--------------------<session control>----------------------
@@ -197,7 +236,7 @@ def exit():
 @app.route("/", methods=["GET","POST"])
 @is_logged
 def index():
-	return flask.render_template("index.html", author = Author.query.get(flask.session['user_id']))
+	return flask.render_template("index.html", author = getUser())
 
 
 
@@ -205,7 +244,7 @@ def index():
 @is_logged
 def new_post():
 	if flask.request.method == 'GET':
-		return flask.render_template("new_post.html", author = Author.query.get(flask.session['user_id']))
+		return flask.render_template("new_post.html", author = getUser())
 	else:
 		f = flask.request.form.to_dict(flat=False)
 
@@ -261,7 +300,7 @@ def new_post():
 @app.route('/cal') #page with calendar
 @is_logged
 def calendar():
-	return flask.render_template("cal.html", author = Author.query.get(flask.session['user_id']))
+	return flask.render_template("cal.html", author = getUser())
 
 @app.route('/data') #send JSON events to calendar
 @is_logged
