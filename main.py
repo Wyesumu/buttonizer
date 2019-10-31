@@ -307,7 +307,6 @@ def Callback_answer(call):
 
 		if user not in post.users:
 			bot.answer_callback_query(call.id, show_alert=True, text=button.details)
-			user = User(id = call.from_user.id)
 			post.users.append(user)
 			button.users.append(user)
 			print("user wasnt found in post. added in post and button")
