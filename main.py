@@ -234,8 +234,8 @@ def new_post():
 			for button in new_post.buttons:
 				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
 
-			for i in range(0,len(buttons),3):
-				keyboard.add(*buttons[i:i+3])
+			for i in range(0,len(buttons),config.buttons_row):
+				keyboard.add(*buttons[i:i+config.buttons_row])
 
 			try:
 				if new_post.image_addr and new_post.text:
@@ -299,26 +299,23 @@ def Callback_answer(call):
 		user = User.query.get(call.from_user.id)
 		post = Post.query.get(button.post_id)
 
-		if not user:
+		if not user: #if user not in database. Create him
 			user = User(id = call.from_user.id)
 			db.session.add(user)
-			print("no user found. Created")
 			db.session.flush()
 
-		if user not in post.users:
+		if user not in post.users: #if user not in post, add him in post and in button he pressed
 			bot.answer_callback_query(call.id, show_alert=True, text=button.details)
 			post.users.append(user)
 			button.users.append(user)
-			print("user wasnt found in post. added in post and button")
 			db.session.add(post)
 			db.session.add(button)
 			db.session.flush()
-		else:
-			if user in button.users:
-				print("user was in post and button. Showed message")
+		else: #if user in post
+			if user in button.users: #check if he's in button
+				#if he's in button, then show him a message
 				bot.answer_callback_query(call.id, show_alert=True, text=button.details)
-			else:
-				print("user was in post, but not in button. rejected")
+			else: #if not - reject
 				bot.answer_callback_query(call.id, text="Вы уже ответили")
 
 		db.session.commit()
