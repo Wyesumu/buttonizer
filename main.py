@@ -302,6 +302,7 @@ def Callback_answer(call):
 		if not user:
 			user = User(id = call.from_user.id)
 			db.session.add(user)
+			print("no user found. Created")
 			db.session.flush()
 
 		if user not in post.users:
@@ -309,17 +310,20 @@ def Callback_answer(call):
 			user = User(id = call.from_user.id)
 			post.users.append(user)
 			button.users.append(user)
+			print("user wasnt found in post. added in post and button")
 			db.session.add(post)
 			db.session.add(button)
 			db.session.flush()
 		else:
 			if user in button.users:
+				print("user was in post and button. Showed message")
 				bot.answer_callback_query(call.id, show_alert=True, text=button.details)
 			else:
+				print("user was in post, but not in button. rejected")
 				bot.answer_callback_query(call.id, text="Вы уже ответили")
 
 		db.session.commit()
-		
+
 	except telebot.apihelper.ApiException:
 		print(" Warning: Server overloaded and wasn't able to answer in time")
 	except Exception as e:
