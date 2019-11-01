@@ -101,7 +101,7 @@ class Button(db.Model):
 							backref=db.backref('button', lazy=True))
 
 	def __str__(self):
-		return self.id
+		return str(self.id)
 
 class User(db.Model):
 
@@ -110,7 +110,7 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 
 	def __str__(self):
-		return self.id
+		return str(self.id)
 
 db.create_all()
 #-------------------/database/---------------------------
