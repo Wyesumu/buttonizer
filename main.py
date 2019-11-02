@@ -113,7 +113,8 @@ class User(db.Model):
 	def __str__(self):
 		return str(self.id)
 
-db.create_all()
+if __name__ == "__main__":
+	db.create_all()
 #-------------------/database/---------------------------
 
 #-------------------<tool functions>---------------------------
@@ -143,6 +144,33 @@ def get_percent(post, button):
 		return str(round(len(button) / len(post) * 100)) + "%"
 	except ZeroDivisionError:
 		return "100%"
+
+def send_message(post):
+	keyboard = telebot.types.InlineKeyboardMarkup()
+	buttons = []
+	for button in post.buttons:
+		buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
+
+	for i in range(0,len(buttons),config.buttons_row):
+		keyboard.add(*buttons[i:i+config.buttons_row])
+
+	try:
+		if post.image_addr and post.text:
+			photo = open(config.UPLOAD_FOLDER + post.image_addr, 'rb')
+			bot.send_photo(post.channel.name, photo, post.text, reply_markup=keyboard)
+			photo.close()
+			os.remove(config.UPLOAD_FOLDER + post.image_addr)
+		elif post.image_addr:
+			photo = open(config.UPLOAD_FOLDER + post.image_addr, 'rb')
+			bot.send_photo(post.channel.name, photo, reply_markup=keyboard)
+			photo.close()
+			os.remove(config.UPLOAD_FOLDER + post.image_addr)
+		else:
+			bot.send_message(post.channel.name, post.text, reply_markup=keyboard)
+
+	except Exception as e:
+		flask.flash(e)
+		print(e)
 
 #------------------/tool functions/---------------------------
 
@@ -246,8 +274,6 @@ def exit():
 def index():
 	return flask.render_template("index.html", author = getUser())
 
-
-
 @app.route("/new", methods=["GET","POST"])
 @is_logged
 def new_post():
@@ -276,31 +302,7 @@ def new_post():
 		db.session.commit()
 
 		if not time:
-			keyboard = telebot.types.InlineKeyboardMarkup()
-			buttons = []
-			for button in new_post.buttons:
-				buttons.append(telebot.types.InlineKeyboardButton(text = button.text, callback_data = button.id))
-
-			for i in range(0,len(buttons),config.buttons_row):
-				keyboard.add(*buttons[i:i+config.buttons_row])
-
-			try:
-				if new_post.image_addr and new_post.text:
-					photo = open(config.UPLOAD_FOLDER + new_post.image_addr, 'rb')
-					bot.send_photo(new_post.channel.name, photo, new_post.text, reply_markup=keyboard)
-					photo.close()
-					os.remove(config.UPLOAD_FOLDER + new_post.image_addr)
-				elif new_post.image_addr:
-					photo = open(config.UPLOAD_FOLDER + new_post.image_addr, 'rb')
-					bot.send_photo(new_post.channel.name, photo, reply_markup=keyboard)
-					photo.close()
-					os.remove(config.UPLOAD_FOLDER + new_post.image_addr)
-				else:
-					bot.send_message(new_post.channel.name, new_post.text, reply_markup=keyboard)
-
-			except Exception as e:
-				flask.flash(e)
-				print(e)
+			send_message(new_post)
 		
 		return flask.redirect(flask.url_for("new_post"))
 
