@@ -8,7 +8,7 @@ import config
 import os
 #datetime
 from datetime import datetime as dt
-import time
+from time import time
 #from datetime import date, timedelta
 #crypt for user's password
 from flask_bcrypt import Bcrypt
