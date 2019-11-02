@@ -355,7 +355,7 @@ def Callback_answer(call):
 		else: #if user in post
 			if user in button.users: #check if he's in button
 				#if he's in button, then show him a message
-				bot.answer_callback_query(call.id, show_alert=True, text=button.details)
+				bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(button.users.len() / post.users.len() * 100) + "%")
 			else: #if not - reject
 				bot.answer_callback_query(call.id, text="Вы уже ответили")
 
