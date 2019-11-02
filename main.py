@@ -365,6 +365,6 @@ def Callback_answer(call):
 
 	except telebot.apihelper.ApiException:
 		print(" Warning: Server overloaded and wasn't able to answer in time")
-	except Exception as e:
-		print(" Callback Ошибка: " + str(e))
+	#except Exception as e:
+	#	print(" Callback Ошибка: " + str(e))
 #---------------------/telegram bot/--------------------------
