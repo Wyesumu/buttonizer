@@ -346,7 +346,7 @@ def Callback_answer(call):
 			db.session.flush()
 
 		if user not in post.users: #if user not in post, add him in post and in button he pressed
-			bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(len(button.users) / len(post.users) * 100) + "%")
+			bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(round(len(button.users) / len(post.users) * 100)) + "%")
 			post.users.append(user)
 			button.users.append(user)
 			db.session.add(post)
@@ -355,7 +355,7 @@ def Callback_answer(call):
 		else: #if user in post
 			if user in button.users: #check if he's in button
 				#if he's in button, then show him a message
-				bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(len(button.users) / len(post.users) * 100) + "%")
+				bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(round(len(button.users) / len(post.users) * 100)) + "%")
 			else: #if not - reject
 				bot.answer_callback_query(call.id, text="Вы уже ответили")
 
