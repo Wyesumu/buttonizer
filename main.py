@@ -8,6 +8,7 @@ import config
 import os
 #datetime
 from datetime import datetime as dt
+import time
 #from datetime import date, timedelta
 #crypt for user's password
 from flask_bcrypt import Bcrypt
@@ -166,7 +167,7 @@ class ButtonView(ModelView):
 	column_display_pk = True
 
 	def is_accessible(self):
-		return user_allowed(5)
+		return user_allowed(2)
 
 
 admin = Admin(app)
@@ -334,6 +335,7 @@ def content_error(message):
 @bot.callback_query_handler(func=lambda call: True)
 def Callback_answer(call):
 	try:
+		start_time = time()
 		button = Button.query.get(call.data)
 		user = User.query.get(call.from_user.id)
 		post = Post.query.get(button.post_id)
@@ -344,7 +346,7 @@ def Callback_answer(call):
 			db.session.flush()
 
 		if user not in post.users: #if user not in post, add him in post and in button he pressed
-			bot.answer_callback_query(call.id, show_alert=True, text=button.details)
+			bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(button.users.len() / post.users.len() * 100) + "%")
 			post.users.append(user)
 			button.users.append(user)
 			db.session.add(post)
@@ -358,6 +360,8 @@ def Callback_answer(call):
 				bot.answer_callback_query(call.id, text="Вы уже ответили")
 
 		db.session.commit()
+		end_time = time()
+		print(end_time - start_time)
 
 	except telebot.apihelper.ApiException:
 		print(" Warning: Server overloaded and wasn't able to answer in time")
