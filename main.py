@@ -137,6 +137,13 @@ def user_allowed(level):
 		return True
 	else:
 		return False
+
+def get_percent(post, button):
+	try:
+		return str(round(len(button) / len(post) * 100)) + "%"
+	except ZeroDivisionError:
+		return "100%"
+
 #------------------/tool functions/---------------------------
 
 #--------------------<flask-admin>---------------------------
@@ -346,7 +353,7 @@ def Callback_answer(call):
 			db.session.flush()
 
 		if user not in post.users: #if user not in post, add him in post and in button he pressed
-			bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(round(len(button.users) / len(post.users) * 100)) + "%")
+			bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + get_percent(button.users, post.users))
 			post.users.append(user)
 			button.users.append(user)
 			db.session.add(post)
@@ -355,7 +362,7 @@ def Callback_answer(call):
 		else: #if user in post
 			if user in button.users: #check if he's in button
 				#if he's in button, then show him a message
-				bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + str(round(len(button.users) / len(post.users) * 100)) + "%")
+				bot.answer_callback_query(call.id, show_alert=True, text=button.details + " Ответили также: " + get_percent(button.users, post.users))
 			else: #if not - reject
 				bot.answer_callback_query(call.id, text="Вы уже ответили")
 
